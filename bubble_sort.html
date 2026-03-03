@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>氣泡排序法</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input {
+            margin: 10px 0;
+        }
+        button {
+            margin: 10px 0;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>氣泡排序法</h1>
+    <p>請輸入一組數字（以逗號分隔，例如：64,34,25,12,22,11,90）：</p>
+    <input type="text" id="numbers" placeholder="輸入數字">
+    <button onclick="performBubbleSort()">排序</button>
+    <div class="result" id="result"></div>
+
+    <script>
+        // 氣泡排序法實作
+        function bubbleSort(arr) {
+            let n = arr.length;
+            for (let i = 0; i < n; i++) {
+                for (let j = 0; j < n - i - 1; j++) {
+                    if (arr[j] > arr[j + 1]) {
+                        // 交換元素
+                        let temp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = temp;
+                    }
+                }
+            }
+            return arr;
+        }
+
+        // 執行排序並顯示結果
+        function performBubbleSort() {
+            const input = document.getElementById("numbers").value;
+            if (!input) {
+                alert("請輸入數字！");
+                return;
+            }
+
+            // 將輸入的字串轉換為數字陣列
+            const arr = input.split(",").map(num => parseFloat(num.trim()));
+            if (arr.some(isNaN)) {
+                alert("請確保所有輸入都是有效的數字！");
+                return;
+            }
+
+            // 排序並顯示結果
+            const sortedArray = bubbleSort(arr);
+            document.getElementById("result").textContent = `排序結果: ${sortedArray.join(", ")}`;
+        }
+    </script>
+</body>
+</html>
