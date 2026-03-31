@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排序演算法集錦 - 插入排序</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background: radial-gradient(circle at top, #f3f9ff 0%, #e3edf5 45%, #d7e2eb 100%);
+            color: #263445;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        nav {
+            background: rgba(44, 62, 80, 0.95);
+            width: 100%;
+            padding: 18px 0;
+            text-align: center;
+            box-shadow: 0 14px 40px rgba(20, 40, 68, 0.16);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        nav a {
+            color: #e9f1fb;
+            text-decoration: none;
+            margin: 0 16px;
+            font-weight: 700;
+            font-size: 16px;
+            padding: 10px 18px;
+            border-radius: 999px;
+            transition: all 0.25s ease;
+        }
+        nav a:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+        }
+        nav a.active {
+            color: #2ecc71;
+            background: rgba(46, 204, 113, 0.14);
+        }
+        .page {
+            width: 100%;
+            max-width: 980px;
+            padding: 28px 20px 42px;
+        }
+        .hero {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 24px;
+            padding: 30px 30px 26px;
+            box-shadow: 0 24px 56px rgba(20, 40, 68, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            text-align: center;
+            margin-top: 22px;
+        }
+        .badge {
+            display: inline-block;
+            background: #2ecc71;
+            color: #ffffff;
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
+            padding: 8px 16px;
+            border-radius: 999px;
+            margin-bottom: 16px;
+        }
+        h1 {
+            font-size: 2.8rem;
+            margin: 0;
+            letter-spacing: 0.02em;
+            color: #1f3246;
+        }
+        .subtitle {
+            color: #526478;
+            font-size: 1rem;
+            line-height: 1.8;
+            max-width: 720px;
+            margin: 16px auto 0;
+        }
+        #container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: 320px;
+            width: 100%;
+            background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+            padding: 24px;
+            border-radius: 24px;
+            box-shadow: 0 22px 50px rgba(20, 40, 68, 0.08);
+            border: 1px solid rgba(56, 95, 139, 0.08);
+            margin: 32px 0;
+        }
+        .bar {
+            width: 32px;
+            margin: 0 4px;
+            background: linear-gradient(180deg, #5dacfa 0%, #2f82f0 100%);
+            transition: 0.2s height ease, 0.2s transform ease;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            color: #ffffff;
+            font-size: 12px;
+            padding-bottom: 6px;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 6px 18px rgba(35, 83, 139, 0.12);
+        }
+        .bar:hover {
+            transform: translateY(-3px);
+        }
+        .comparing { background: #f1c40f !important; }
+        .sorted { background: #9b59b6 !important; }
+        .current { background: #2ecc71 !important; }
+        .shifting { background: #e67e22 !important; }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+        button {
+            min-width: 150px;
+            padding: 12px 26px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 999px;
+            transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+            font-weight: 700;
+            box-shadow: 0 14px 28px rgba(20, 40, 68, 0.12);
+        }
+        .btn-start {
+            background: #2ecc71;
+            color: #ffffff;
+        }
+        .btn-start:hover {
+            background: #27ae60;
+            transform: translateY(-2px);
+        }
+        .btn-reset {
+            background: #ffffff;
+            color: #2c3e50;
+            border: 1px solid rgba(44, 62, 80, 0.14);
+        }
+        .btn-reset:hover {
+            background: #f4fbff;
+            transform: translateY(-2px);
+        }
+        button:hover:not(:disabled) {
+            opacity: 0.98;
+        }
+        button:disabled {
+            background: #bdc3c7;
+            color: #6b7280;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">氣泡排序 (Bubble)</a>
+        <a href="selection_sort.html">選擇排序 (Selection)</a>
+        <a href="insertion_sort.html" class="active">插入排序 (Insertion)</a>
+    </nav>
+    <main class="page">
+        <section class="hero">
+            <span class="badge">排序演算法集錦</span>
+            <h1>插入排序 (Insertion Sort)</h1>
+            <p class="subtitle">從左側已排序區開始插入新元素，逐步建立有序序列。</p>
+        </section>
+        <div id="container"></div>
+        <div class="controls">
+            <button class="btn-start" id="startBtn" onclick="insertionSort()">開始排序</button>
+            <button class="btn-reset" onclick="reset()">重置數組</button>
+        </div>
+    </main>
+    <script>
+        const container = document.getElementById('container');
+        let array = [];
+        const SIZE = 12;
+
+        function reset() {
+            container.innerHTML = '';
+            array = [];
+            for (let i = 0; i < SIZE; i++) {
+                const value = Math.floor(Math.random() * 90) + 10;
+                array.push(value);
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${value * 2.5}px`;
+                bar.innerText = value;
+                bar.id = `bar-${i}`;
+                container.appendChild(bar);
+            }
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+        async function insertionSort() {
+            const bars = document.getElementsByClassName('bar');
+            document.getElementById('startBtn').disabled = true;
+            for (let i = 1; i < array.length; i++) {
+                const key = array[i];
+                let j = i - 1;
+                bars[i].classList.add('current');
+                await sleep(180);
+                while (j >= 0 && array[j] > key) {
+                    bars[j].classList.add('shifting');
+                    array[j + 1] = array[j];
+                    bars[j + 1].style.height = `${array[j + 1] * 2.5}px`;
+                    bars[j + 1].innerText = array[j + 1];
+                    await sleep(180);
+                    bars[j].classList.remove('shifting');
+                    j--;
+                }
+                array[j + 1] = key;
+                bars[j + 1].style.height = `${key * 2.5}px`;
+                bars[j + 1].innerText = key;
+                bars[i].classList.remove('current');
+                for (let k = 0; k <= i; k++) {
+                    bars[k].classList.add('sorted');
+                }
+                await sleep(120);
+            }
+        }
+
+        reset();
+    </script>
+</body>
+</html>

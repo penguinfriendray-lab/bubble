@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>氣泡排序法視覺化</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f4f7f6;
+            margin-top: 50px;
+        }
+        h1 { color: #333; }
+        #container {
+            display: flex;
+            align-items: flex-end;
+            height: 300px;
+            gap: 5px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .bar {
+            width: 30px;
+            background-color: #3498db;
+            transition: 0.2s all ease;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            color: white;
+            font-size: 12px;
+            padding-bottom: 5px;
+            border-radius: 3px 3px 0 0;
+        }
+        .controls { margin-top: 30px; }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:disabled { background-color: #bdc3c7; }
+        .comparing { background-color: #e74c3c !important; } /* 比對中的顏色 */
+        .sorted { background-color: #9b59b6 !important; }    /* 已排序完成的顏色 */
+    </style>
+</head>
+<body>
+
+    <h1>氣泡排序法 (Bubble Sort) 視覺化</h1>
+    
+    <div id="container"></div>
+
+    <div class="controls">
+        <button onclick="startSort()" id="startBtn">開始排序</button>
+        <button onclick="resetArray()">重置數組</button>
+    </div>
+
+    <script>
+        const container = document.getElementById('container');
+        let array = [];
+        const ARRAY_SIZE = 15;
+
+        // 初始化：產生隨機數組並渲染畫面上
+        function resetArray() {
+            container.innerHTML = '';
+            array = [];
+            for (let i = 0; i < ARRAY_SIZE; i++) {
+                const val = Math.floor(Math.random() * 100) + 10;
+                array.push(val);
+                const bar = document.createElement('div');
+                bar.classList.add('bar');
+                bar.style.height = `${val * 2.5}px`;
+                bar.innerText = val;
+                bar.id = `bar-${i}`;
+                container.appendChild(bar);
+            }
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        // 延遲函數（用於製造動畫效果）
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        // 氣泡排序主邏輯
+        async function startSort() {
+            const btn = document.getElementById('startBtn');
+            btn.disabled = true;
+
+            const bars = document.getElementsByClassName('bar');
+
+            for (let i = 0; i < array.length; i++) {
+                for (let j = 0; j < array.length - i - 1; j++) {
+                    // 標示正在比對的兩個元素
+                    bars[j].classList.add('comparing');
+                    bars[j+1].classList.add('comparing');
+
+                    await sleep(200);
+
+                    if (array[j] > array[j + 1]) {
+                        // 交換數組中的值
+                        [array[j], array[j + 1]] = [array[j + 1], array[j]];
+                        
+                        // 交換 DOM 元素的高度與文字
+                        bars[j].style.height = `${array[j] * 2.5}px`;
+                        bars[j].innerText = array[j];
+                        bars[j+1].style.height = `${array[j+1] * 2.5}px`;
+                        bars[j+1].innerText = array[j+1];
+                    }
+
+                    // 移除比對中的顏色
+                    bars[j].classList.remove('comparing');
+                    bars[j+1].classList.remove('comparing');
+                }
+                // 將末端已確定的元素標示為「已完成」
+                bars[array.length - i - 1].classList.add('sorted');
+            }
+        }
+
+        // 初始執行一次
+        resetArray();
+    </script>
+</body>
+</html>
