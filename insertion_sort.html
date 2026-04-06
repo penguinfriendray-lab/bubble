@@ -502,21 +502,36 @@ print("排序後:", arr)</code></pre>
                 for (let i = 1; i < array.length; i++) {
                     const key = array[i];
                     let j = i - 1;
+
+                    // 標記當前元素
                     bars[i].classList.add('current');
                     await sleep(180);
+
+                    // 找到插入位置並移動元素
                     while (j >= 0 && array[j] > key) {
+                        // 標記正在移動的元素
+                        bars[j].classList.add('shifting');
+                        await sleep(180);
+
+                        // 移動元素
                         array[j + 1] = array[j];
                         bars[j + 1].style.height = `${array[j] * 2.5}px`;
                         bars[j + 1].innerText = array[j];
-                        bars[j].classList.add('shifting');
-                        await sleep(180);
+
+                        // 清除標記
                         bars[j].classList.remove('shifting');
                         j--;
                     }
+
+                    // 插入 key
                     array[j + 1] = key;
                     bars[j + 1].style.height = `${key * 2.5}px`;
                     bars[j + 1].innerText = key;
+
+                    // 清除當前標記
                     bars[i].classList.remove('current');
+
+                    // 標記已排序的部分
                     for (let k = 0; k <= i; k++) {
                         bars[k].classList.add('sorted');
                     }
