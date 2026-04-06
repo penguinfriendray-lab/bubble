@@ -1,0 +1,548 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排序演算法集錦 - 插入排序</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(255, 182, 193, 0.3) 0%, transparent 50%),
+                linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #263445;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            z-index: -1;
+        }
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            width: 100%;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        nav a {
+            color: #4a5568;
+            text-decoration: none;
+            margin: 0 20px;
+            font-weight: 600;
+            font-size: 16px;
+            padding: 12px 24px;
+            border-radius: 50px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        nav a:hover::before {
+            left: 100%;
+        }
+        nav a:hover {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        nav a.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #ffffff;
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        .page {
+            width: 100%;
+            max-width: 980px;
+            padding: 28px 20px 42px;
+        }
+        .hero {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 40px 40px 32px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-align: center;
+            margin-top: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+        }
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #ffffff;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            padding: 10px 20px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        h1 {
+            font-size: 3.2rem;
+            margin: 0;
+            letter-spacing: 0.02em;
+            color: #1a202c;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        .subtitle {
+            color: #4a5568;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            max-width: 720px;
+            margin: 20px auto 0;
+            font-weight: 400;
+        }
+        #container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: 340px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 28px;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin: 40px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        #container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+        }
+        .bar {
+            width: 36px;
+            margin: 0 6px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            color: #ffffff;
+            font-size: 13px;
+            padding-bottom: 8px;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.3);
+            position: relative;
+            font-weight: 600;
+        }
+        .bar::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .bar:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+        .bar:hover::after {
+            opacity: 1;
+        }
+        .comparing {
+            background: linear-gradient(180deg, #f093fb 0%, #f5576c 100%) !important;
+            animation: comparing 1s ease-in-out infinite alternate;
+        }
+        @keyframes comparing {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.1); }
+        }
+        .sorted {
+            background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%) !important;
+        }
+        .current {
+            background: linear-gradient(180deg, #43e97b 0%, #38f9d7 100%) !important;
+        }
+        .shifting {
+            background: linear-gradient(180deg, #fa709a 0%, #fee140 100%) !important;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 50px;
+        }
+        button {
+            min-width: 160px;
+            padding: 14px 32px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 50px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        button:hover::before {
+            left: 100%;
+        }
+        .btn-start {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #ffffff;
+        }
+        .btn-start:hover {
+            background: linear-gradient(135deg, #5a67d8, #6b46c1);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #4a5568;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+        }
+        .btn-reset:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.2);
+        }
+        button:hover:not(:disabled) {
+            transform: translateY(-3px);
+        }
+        button:disabled {
+            background: linear-gradient(135deg, #a0aec0, #718096);
+            color: #e2e8f0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        button:disabled::before {
+            display: none;
+        }
+        .explanation {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin: 40px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .explanation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+        }
+        .explanation h2 {
+            color: #1a202c;
+            font-size: 2.2rem;
+            margin-top: 0;
+            margin-bottom: 24px;
+            font-weight: 700;
+            position: relative;
+        }
+        .explanation h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+        .explanation h3 {
+            color: #2d3748;
+            font-size: 1.6rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        .explanation h3::before {
+            content: '💡';
+            margin-right: 12px;
+            font-size: 1.2em;
+        }
+        .explanation p {
+            line-height: 1.7;
+            color: #4a5568;
+            font-size: 1.05rem;
+        }
+        .explanation ol, .explanation ul {
+            line-height: 1.7;
+            color: #4a5568;
+            padding-left: 20px;
+        }
+        .explanation li {
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+        }
+        .explanation pre {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        .explanation pre::before {
+            content: 'Python';
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .explanation code {
+            background: linear-gradient(135deg, #e6fffa, #b2f5ea);
+            color: #065f46;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">氣泡排序 (Bubble)</a>
+        <a href="selection_sort.html">選擇排序 (Selection)</a>
+        <a href="insertion_sort.html" class="active">插入排序 (Insertion)</a>
+    </nav>
+    <main class="page">
+        <section class="hero">
+            <span class="badge">排序演算法集錦</span>
+            <h1>插入排序 (Insertion Sort)</h1>
+            <p class="subtitle">從左側已排序區開始插入新元素，逐步建立有序序列。</p>
+        </section>
+
+        <section class="explanation">
+            <h2>操作原理</h2>
+            <p>插入排序是一種簡單直觀的排序演算法，其基本思想是：</p>
+            <ol>
+                <li>將序列分成已排序區間和未排序區間</li>
+                <li>從未排序區間取第一個元素</li>
+                <li>將該元素插入到已排序區間的適當位置</li>
+                <li>重複上述過程，直到未排序區間為空</li>
+            </ol>
+            <p>這個過程就像打撲克牌時整理手中的牌一樣，每次拿到新牌就插入到正確的位置。</p>
+
+            <h3>Python 代碼實現</h3>
+            <pre><code>def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]  # 當前要插入的元素
+        j = i - 1
+        
+        # 將大於 key 的元素向右移動
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        
+        # 插入 key 到正確位置
+        arr[j + 1] = key
+    
+    return arr
+
+# 範例使用
+arr = [12, 11, 13, 5, 6]
+print("原始陣列:", arr)
+insertion_sort(arr)
+print("排序後:", arr)</code></pre>
+
+            <h3>複雜度分析</h3>
+            <ul>
+                <li><strong>時間複雜度：</strong>
+                    <ul>
+                        <li>最壞情況：O(n²) - 當陣列逆序時</li>
+                        <li>最佳情況：O(n) - 當陣列已經排序時</li>
+                        <li>平均情況：O(n²)</li>
+                    </ul>
+                    <p>比較次數取決於輸入資料的初始順序。</p>
+                </li>
+                <li><strong>空間複雜度：</strong>O(1)</li>
+                <li><strong>穩定性：</strong>穩定排序</li>
+                <li><strong>原地排序：</strong>是</li>
+            </ul>
+        </section>
+
+        <div id="container"></div>
+        <div class="controls">
+            <button class="btn-start" id="startBtn" onclick="insertionSort()">開始排序</button>
+            <button class="btn-reset" onclick="reset()">重置數組</button>
+        </div>
+    </main>
+    <script>
+        const container = document.getElementById('container');
+        let array = [];
+        const SIZE = 12;
+
+        function reset() {
+            container.innerHTML = '';
+            array = [];
+            for (let i = 0; i < SIZE; i++) {
+                const value = Math.floor(Math.random() * 90) + 10;
+                array.push(value);
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                bar.style.height = `${value * 2.5}px`;
+                bar.innerText = value;
+                bar.id = `bar-${i}`;
+                container.appendChild(bar);
+            }
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+        async function insertionSort() {
+            const bars = document.getElementsByClassName('bar');
+            document.getElementById('startBtn').disabled = true;
+            try {
+                for (let i = 1; i < array.length; i++) {
+                    const key = array[i];
+                    let j = i - 1;
+
+                    // 標記當前元素
+                    bars[i].classList.add('current');
+                    await sleep(180);
+
+                    // 找到插入位置並移動元素
+                    while (j >= 0 && array[j] > key) {
+                        // 標記正在移動的元素
+                        bars[j].classList.add('shifting');
+                        await sleep(180);
+
+                        // 移動元素
+                        array[j + 1] = array[j];
+                        bars[j + 1].style.height = `${array[j] * 2.5}px`;
+                        bars[j + 1].innerText = array[j];
+
+                        // 清除標記
+                        bars[j].classList.remove('shifting');
+                        j--;
+                    }
+
+                    // 插入 key
+                    array[j + 1] = key;
+                    bars[j + 1].style.height = `${key * 2.5}px`;
+                    bars[j + 1].innerText = key;
+
+                    // 清除當前標記
+                    bars[i].classList.remove('current');
+
+                    // 標記已排序的部分
+                    for (let k = 0; k <= i; k++) {
+                        bars[k].classList.add('sorted');
+                    }
+                    await sleep(120);
+                }
+            } finally {
+                document.getElementById('startBtn').disabled = false;
+            }
+        }
+
+        reset();
+    </script>
+</body>
+</html>
