@@ -159,6 +159,54 @@
             transform: none;
             box-shadow: none;
         }
+        .explanation {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 24px 56px rgba(20, 40, 68, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            margin: 32px 0;
+        }
+        .explanation h2 {
+            color: #1f3246;
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .explanation h3 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .explanation p {
+            line-height: 1.6;
+            color: #526478;
+        }
+        .explanation ol, .explanation ul {
+            line-height: 1.6;
+            color: #526478;
+        }
+        .explanation li {
+            margin-bottom: 8px;
+        }
+        .explanation pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .explanation code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -173,6 +221,54 @@
             <h1>選擇排序 (Selection Sort)</h1>
             <p class="subtitle">每回合找出最小元素並放到左側，觀察排序過程更具邏輯。</p>
         </section>
+
+        <section class="explanation">
+            <h2>操作原理</h2>
+            <p>選擇排序是一種簡單的排序演算法，其基本思想是：</p>
+            <ol>
+                <li>從未排序的序列中找到最小（或最大）元素</li>
+                <li>將其放到已排序序列的末尾</li>
+                <li>重複上述步驟，直到所有元素都排序完畢</li>
+            </ol>
+            <p>這個過程就像是從一堆數字中每次挑選最小的放到前面一樣。</p>
+
+            <h3>Python 代碼實現</h3>
+            <pre><code>def selection_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        # 找到未排序部分的最小元素
+        min_idx = i
+        for j in range(i+1, n):
+            if arr[j] < arr[min_idx]:
+                min_idx = j
+        
+        # 交換最小元素到已排序部分的末尾
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+    
+    return arr
+
+# 範例使用
+arr = [64, 25, 12, 22, 11]
+print("原始陣列:", arr)
+selection_sort(arr)
+print("排序後:", arr)</code></pre>
+
+            <h3>複雜度分析</h3>
+            <ul>
+                <li><strong>時間複雜度：</strong>
+                    <ul>
+                        <li>最壞情況：O(n²)</li>
+                        <li>最佳情況：O(n²)</li>
+                        <li>平均情況：O(n²)</li>
+                    </ul>
+                    <p>無論輸入資料如何，都需要進行 n(n-1)/2 次比較。</p>
+                </li>
+                <li><strong>空間複雜度：</strong>O(1)</li>
+                <li><strong>穩定性：</strong>不穩定排序</li>
+                <li><strong>原地排序：</strong>是</li>
+            </ul>
+        </section>
+
         <div id="container"></div>
         <div class="controls">
             <button class="btn-start" onclick="selectionSort()" id="startBtn">開始排序</button>
