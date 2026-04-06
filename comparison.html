@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>綜合比較</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0d1117;
+            color: #e5e7eb;
+            margin: 0;
+            padding: 24px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+        }
+        h1 { margin-top: 0; color: #a78bfa; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 14px 12px; border: 1px solid rgba(148, 163, 184, 0.25); }
+        th { background: rgba(79, 70, 229, 0.12); }
+        td { background: rgba(255, 255, 255, 0.04); }
+        ul { padding-left: 20px; }
+        .nav { margin-top: 24px; }
+        .nav a { color: #7dd3fc; text-decoration: none; margin-right: 18px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>綜合比較</h1>
+        <p>這裡匯總本專案中的六種排序演算法，幫助你快速比較它們的時間複雜度、空間使用與穩定性。</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>演算法</th>
+                    <th>平均時間</th>
+                    <th>最壞時間</th>
+                    <th>空間</th>
+                    <th>穩定性</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>氣泡排序</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>✅</td></tr>
+                <tr><td>選擇排序</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>❌</td></tr>
+                <tr><td>插入排序</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td>✅</td></tr>
+                <tr><td>合併排序</td><td>O(n log n)</td><td>O(n log n)</td><td>O(n)</td><td>✅</td></tr>
+                <tr><td>快速排序</td><td>O(n log n)</td><td>O(n²)</td><td>O(log n)</td><td>❌</td></tr>
+                <tr><td>堆積排序</td><td>O(n log n)</td><td>O(n log n)</td><td>O(1)</td><td>❌</td></tr>
+            </tbody>
+        </table>
+        <h2>推薦使用情境</h2>
+        <ul>
+            <li>教學與小資料集：氣泡排序與插入排序。</li>
+            <li>大資料集與穩定需求：合併排序。</li>
+            <li>平均效能優先：快速排序。</li>
+            <li>固定最壞時間需求：堆積排序。</li>
+        </ul>
+        <div class="nav">
+            <a href="./index.html">回首頁</a>
+            <a href="./reflection.html">學習心得</a>
+            <a href="./README.md">完整報告</a>
+        </div>
+    </div>
+</body>
+</html>

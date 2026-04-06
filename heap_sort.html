@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>堆積排序法視覺化</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f4f7f6;
+            margin-top: 50px;
+        }
+        h1 { color: #333; }
+        #container {
+            display: flex;
+            align-items: flex-end;
+            height: 300px;
+            gap: 5px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: min(1000px, 100%);
+        }
+        .bar {
+            width: 30px;
+            background-color: #3498db;
+            transition: 0.2s all ease;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            color: white;
+            font-size: 12px;
+            padding-bottom: 5px;
+            border-radius: 3px 3px 0 0;
+        }
+        .controls { margin-top: 30px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:disabled { background-color: #bdc3c7; }
+        .comparing { background-color: #e74c3c !important; }
+        .heap-root { background-color: #f39c12 !important; }
+        .sorted { background-color: #9b59b6 !important; }
+        .nav { margin-top: 20px; }
+        .nav a { margin: 0 10px; color: #2d6cdf; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>堆積排序法 (Heap Sort) 視覺化</h1>
+    <div id="container"></div>
+    <div class="controls">
+        <button onclick="startSort()" id="startBtn">開始排序</button>
+        <button onclick="resetArray()">重置數組</button>
+    </div>
+    <div class="nav">
+        <a href="./index.html">回首頁</a>
+        <a href="./README.md">開啟報告</a>
+    </div>
+    <script>
+        const container = document.getElementById('container');
+        let array = [];
+        const ARRAY_SIZE = 15;
+
+        function resetArray() {
+            container.innerHTML = '';
+            array = [];
+            for (let i = 0; i < ARRAY_SIZE; i++) {
+                const val = Math.floor(Math.random() * 90) + 10;
+                array.push(val);
+                const bar = document.createElement('div');
+                bar.classList.add('bar');
+                bar.style.height = `${val * 2.5}px`;
+                bar.innerText = val;
+                bar.id = `bar-${i}`;
+                container.appendChild(bar);
+            }
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        async function swapBars(i, j) {
+            [array[i], array[j]] = [array[j], array[i]];
+            const barA = document.getElementById(`bar-${i}`);
+            const barB = document.getElementById(`bar-${j}`);
+            const heightA = barA.style.height;
+            const heightB = barB.style.height;
+            const textA = barA.innerText;
+            const textB = barB.innerText;
+            barA.style.height = heightB;
+            barB.style.height = heightA;
+            barA.innerText = textB;
+            barB.innerText = textA;
+        }
+
+        async function heapify(n, i) {
+            const bars = document.getElementsByClassName('bar');
+            let largest = i;
+            const left = 2 * i + 1;
+            const right = 2 * i + 2;
+            if (left < n) { bars[left].classList.add('comparing'); await sleep(120); bars[left].classList.remove('comparing'); }
+            if (right < n) { bars[right].classList.add('comparing'); await sleep(120); bars[right].classList.remove('comparing'); }
+            bars[i].classList.add('heap-root');
+            await sleep(120);
+            if (left < n && array[left] > array[largest]) largest = left;
+            if (right < n && array[right] > array[largest]) largest = right;
+            if (largest !== i) {
+                await swapBars(i, largest);
+                bars[i].classList.remove('heap-root');
+                await heapify(n, largest);
+            }
+            bars[i].classList.remove('heap-root');
+        }
+
+        async function startSort() {
+            document.getElementById('startBtn').disabled = true;
+            const n = array.length;
+            for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+                await heapify(n, i);
+            }
+            for (let end = n - 1; end > 0; end--) {
+                await swapBars(0, end);
+                document.getElementById(`bar-${end}`).classList.add('sorted');
+                await heapify(end, 0);
+            }
+            document.getElementById('bar-0').classList.add('sorted');
+        }
+
+        resetArray();
+    </script>
+</body>
+</html>
