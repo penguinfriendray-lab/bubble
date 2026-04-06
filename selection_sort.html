@@ -34,6 +34,21 @@
         .moving { background: linear-gradient(180deg, #facc15 0%, #fde047 100%) !important; }
         .comparing { background: linear-gradient(180deg, #f093fb 0%, #f5576c 100%) !important; animation: comparing 1s ease-in-out infinite alternate; }
         .sorted { background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%) !important; }
+        .interactive-panel { background: rgba(255, 255, 255, 0.95); border-radius: 28px; padding: 32px; margin-top: 30px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); border: 1px solid rgba(255, 255, 255, 0.35); }
+        .input-group { margin-bottom: 20px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .input-group label { font-weight: 600; color: #1a202c; min-width: 140px; }
+        .input-group input[type="text"] { flex: 1; min-width: 300px; padding: 10px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-family: 'Courier New', monospace; }
+        .input-group input[type="text"]:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        .speed-control { display: flex; align-items: center; gap: 16px; margin: 20px 0; }
+        .speed-control label { font-weight: 600; color: #1a202c; min-width: 100px; }
+        .speed-control input[type="range"] { flex: 1; min-width: 200px; }
+        .speed-display { min-width: 100px; font-weight: 600; color: #667eea; }
+        .button-group { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
+        .button-group button { padding: 12px 20px; font-size: 14px; min-width: 120px; }
+        .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 20px; }
+        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 20px; color: white; text-align: center; }
+        .stat-label { font-size: 0.9rem; opacity: 0.9; margin-bottom: 8px; }
+        .stat-value { font-size: 2rem; font-weight: 700; }
         .controls { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-bottom: 50px; }
         button { min-width: 160px; padding: 14px 32px; font-size: 16px; cursor: pointer; border: none; border-radius: 50px; transition: all 0.3s ease; font-weight: 600; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); position: relative; overflow: hidden; text-transform: uppercase; letter-spacing: 0.5px; }
         button::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.2); transition: left 0.4s ease; }
@@ -88,44 +103,151 @@ print(selection_sort(arr))</code></pre>
                 <li><strong>原地排序：</strong>是</li>
             </ul>
         </section>
+        <section class="interactive-panel">
+            <h2>四、互動視覺化操作</h2>
+            <div class="input-group">
+                <label>輸入數字（逗號分隔）：</label>
+                <input type="text" id="inputArray" placeholder="64, 34, 25, 12, 22, 11, 90">
+            </div>
+            <div class="button-group">
+                <button class="btn-start" onclick="loadInput()">載入/重置</button>
+                <button class="btn-reset" onclick="generateRandom()">隨機產生</button>
+            </div>
+            <div class="speed-control">
+                <label>速度：</label>
+                <input type="range" id="speedSlider" min="50" max="500" value="180" step="10">
+                <span class="speed-display" id="speedDisplay">180ms</span>
+            </div>
+            <div class="button-group">
+                <button class="btn-start" onclick="startSort()" id="startBtn">開始排序</button>
+                <button class="btn-reset" onclick="pauseSort()" id="pauseBtn" style="display:none;">暫停</button>
+                <button class="btn-reset" onclick="resumeSort()" id="resumeBtn" style="display:none;">繼續</button>
+                <button class="btn-reset" onclick="resetArray()">停止</button>
+            </div>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-label">比較次數</div>
+                    <div class="stat-value" id="comparisons">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">交換次數</div>
+                    <div class="stat-value" id="swaps">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">已完成數量</div>
+                    <div class="stat-value" id="completed">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">陣列大小 n</div>
+                    <div class="stat-value" id="arraySize">0</div>
+                </div>
+            </div>
+        </section>
         <div id="container"></div>
         <div class="controls">
-            <button class="btn-start" onclick="selectionSort()" id="startBtn">開始排序</button>
-            <button class="btn-reset" onclick="reset()">重置數組</button>
+            <button class="btn-start" onclick="startSort()" id="startBtn2">開始排序</button>
+            <button class="btn-reset" onclick="resetArray()">重置數組</button>
         </div>
     </main>
     <script>
         const container = document.getElementById('container');
         let array = [];
-        const SIZE = 12;
-        function reset() {
-            container.innerHTML = '';
+        let isSorting = false;
+        let isPaused = false;
+        let stats = { comparisons: 0, swaps: 0, completed: 0 };
+
+        document.getElementById('speedSlider').addEventListener('input', (e) => {
+            document.getElementById('speedDisplay').textContent = e.target.value + 'ms';
+        });
+
+        function getDelay() {
+            return parseInt(document.getElementById('speedSlider').value);
+        }
+
+        function loadInput() {
+            const inputText = document.getElementById('inputArray').value;
+            const values = inputText.split(',').map(v => {
+                const num = parseInt(v.trim());
+                return isNaN(num) ? Math.floor(Math.random() * 90) + 10 : num;
+            });
+            if (values.length === 0) generateRandom();
+            else { array = values; renderArray(); resetStats(); isSorting = false; document.getElementById('startBtn').disabled = false; }
+        }
+
+        function generateRandom() {
             array = [];
-            for (let i = 0; i < SIZE; i++) {
-                const value = Math.floor(Math.random() * 90) + 10;
-                array.push(value);
+            const size = Math.floor(Math.random() * 8) + 6;
+            for (let i = 0; i < size; i++) array.push(Math.floor(Math.random() * 90) + 10);
+            renderArray();
+            resetStats();
+            isSorting = false;
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        function renderArray() {
+            container.innerHTML = '';
+            array.forEach((value, index) => {
                 const bar = document.createElement('div');
                 bar.className = 'bar';
                 bar.style.height = `${value * 2.5}px`;
                 bar.innerText = value;
-                bar.id = `bar-${i}`;
+                bar.id = `bar-${index}`;
                 container.appendChild(bar);
-            }
-            document.getElementById('startBtn').disabled = false;
+            });
+            document.getElementById('arraySize').textContent = array.length;
         }
-        const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-        async function selectionSort() {
+
+        function resetStats() {
+            stats = { comparisons: 0, swaps: 0, completed: 0 };
+            document.getElementById('comparisons').textContent = '0';
+            document.getElementById('swaps').textContent = '0';
+            document.getElementById('completed').textContent = '0';
+        }
+
+        const sleep = (ms) => new Promise(resolve => {
+            const startTime = Date.now();
+            const checkPause = () => {
+                if (isPaused && isSorting) setTimeout(checkPause, 50);
+                else if (Date.now() - startTime < ms) setTimeout(checkPause, 50);
+                else resolve();
+            };
+            checkPause();
+        });
+
+        function pauseSort() {
+            isPaused = true;
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('resumeBtn').style.display = 'inline-block';
+        }
+
+        function resumeSort() {
+            isPaused = false;
+            document.getElementById('resumeBtn').style.display = 'none';
+            document.getElementById('pauseBtn').style.display = 'inline-block';
+        }
+
+        async function startSort() {
+            if (isSorting) return;
+            isSorting = true;
+            isPaused = false;
             const bars = document.getElementsByClassName('bar');
             document.getElementById('startBtn').disabled = true;
+            document.getElementById('startBtn2').disabled = true;
+            document.getElementById('pauseBtn').style.display = 'inline-block';
+            document.getElementById('resumeBtn').style.display = 'none';
+            resetStats();
+
             for (let i = 0; i < array.length; i++) {
                 let min = i;
                 bars[min].classList.add('current');
                 for (let j = i + 1; j < array.length; j++) {
+                    if (!isSorting) return;
                     bars[j].classList.add('comparing');
-                    await sleep(180);
+                    stats.comparisons++;
+                    document.getElementById('comparisons').textContent = stats.comparisons;
+                    await sleep(getDelay());
                     if (array[j] < array[min]) {
                         bars[min].classList.remove('current');
-                        bars[min].classList.remove('comparing');
                         min = j;
                         bars[min].classList.add('current');
                     }
@@ -134,20 +256,44 @@ print(selection_sort(arr))</code></pre>
                 if (min !== i) {
                     bars[i].classList.add('moving');
                     bars[min].classList.add('moving');
-                    await sleep(120);
+                    await sleep(getDelay() * 0.5);
                     [array[i], array[min]] = [array[min], array[i]];
                     bars[i].style.height = `${array[i] * 2.5}px`;
                     bars[i].innerText = array[i];
                     bars[min].style.height = `${array[min] * 2.5}px`;
                     bars[min].innerText = array[min];
+                    stats.swaps++;
+                    document.getElementById('swaps').textContent = stats.swaps;
                     bars[i].classList.remove('moving');
                     bars[min].classList.remove('moving');
                 }
                 bars[min].classList.remove('current');
                 bars[i].classList.add('sorted');
+                stats.completed++;
+                document.getElementById('completed').textContent = stats.completed;
             }
+            isSorting = false;
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('startBtn2').disabled = false;
         }
-        reset();
+
+        function resetArray() {
+            isSorting = false;
+            isPaused = false;
+            container.innerHTML = '';
+            array = [];
+            for (let i = 0; i < 12; i++) array.push(Math.floor(Math.random() * 90) + 10);
+            renderArray();
+            resetStats();
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('startBtn2').disabled = false;
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('resumeBtn').style.display = 'none';
+            document.getElementById('inputArray').value = array.join(', ');
+        }
+
+        resetArray();
     </script>
 </body>
 </html>
