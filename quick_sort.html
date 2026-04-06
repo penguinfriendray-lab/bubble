@@ -151,50 +151,103 @@ print(quick_sort(arr))</code></pre>
     <script>
         const container = document.getElementById('container');
         let array = [];
-        const SIZE = 12;
-        function resetArray() {
-            container.innerHTML = '';
+        let isSorting = false;
+        let isPaused = false;
+        let stats = { comparisons: 0, swaps: 0, completed: 0 };
+
+        document.getElementById('speedSlider').addEventListener('input', (e) => {
+            document.getElementById('speedDisplay').textContent = e.target.value + 'ms';
+        });
+
+        function getDelay() { return parseInt(document.getElementById('speedSlider').value); }
+
+        function loadInput() {
+            const values = document.getElementById('inputArray').value.split(',').map(v => {
+                const num = parseInt(v.trim());
+                return isNaN(num) ? Math.floor(Math.random() * 90) + 10 : num;
+            });
+            if (values.length === 0) generateRandom();
+            else { array = values; renderArray(); resetStats(); document.getElementById('startBtn').disabled = false; }
+        }
+
+        function generateRandom() {
             array = [];
-            for (let i = 0; i < SIZE; i++) {
-                const value = Math.floor(Math.random() * 90) + 10;
-                array.push(value);
+            const size = Math.floor(Math.random() * 8) + 6;
+            for (let i = 0; i < size; i++) array.push(Math.floor(Math.random() * 90) + 10);
+            renderArray();
+            resetStats();
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        function renderArray() {
+            container.innerHTML = '';
+            array.forEach((value, index) => {
                 const bar = document.createElement('div');
                 bar.className = 'bar';
                 bar.style.height = `${value * 2.5}px`;
                 bar.innerText = value;
-                bar.id = `bar-${i}`;
+                bar.id = `bar-${index}`;
                 container.appendChild(bar);
-            }
-            document.getElementById('startBtn').disabled = false;
+            });
+            document.getElementById('arraySize').textContent = array.length;
         }
-        const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+        function resetStats() {
+            stats = { comparisons: 0, swaps: 0, completed: 0 };
+            ['comparisons', 'swaps', 'completed'].forEach(key => {
+                document.getElementById(key).textContent = '0';
+            });
+        }
+
+        const sleep = (ms) => new Promise(resolve => {
+            const startTime = Date.now();
+            const check = () => {
+                if (isPaused && isSorting) setTimeout(check, 50);
+                else if (Date.now() - startTime < ms) setTimeout(check, 50);
+                else resolve();
+            };
+            check();
+        });
+
+        function pauseSort() {
+            isPaused = true;
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('resumeBtn').style.display = 'inline-block';
+        }
+
+        function resumeSort() {
+            isPaused = false;
+            document.getElementById('resumeBtn').style.display = 'none';
+            document.getElementById('pauseBtn').style.display = 'inline-block';
+        }
+
         async function swap(i, j) {
             [array[i], array[j]] = [array[j], array[i]];
             const barA = document.getElementById(`bar-${i}`);
             const barB = document.getElementById(`bar-${j}`);
-            const heightA = barA.style.height;
-            const heightB = barB.style.height;
-            const textA = barA.innerText;
-            const textB = barB.innerText;
-            barA.style.height = heightB;
-            barB.style.height = heightA;
-            barA.innerText = textB;
-            barB.innerText = textA;
+            [barA.style.height, barB.style.height] = [barB.style.height, barA.style.height];
+            [barA.innerText, barB.innerText] = [barB.innerText, barA.innerText];
         }
+
         async function partition(low, high) {
             const bars = document.getElementsByClassName('bar');
             const pivot = array[high];
             bars[high].classList.add('current');
             let i = low - 1;
             for (let j = low; j < high; j++) {
+                if (!isSorting) return i + 1;
                 bars[j].classList.add('comparing');
-                await sleep(180);
+                stats.comparisons++;
+                document.getElementById('comparisons').textContent = stats.comparisons;
+                await sleep(getDelay());
                 if (array[j] < pivot) {
                     i++;
                     bars[i].classList.add('moving');
                     bars[j].classList.add('moving');
                     await swap(i, j);
-                    await sleep(120);
+                    stats.swaps++;
+                    document.getElementById('swaps').textContent = stats.swaps;
+                    await sleep(getDelay() * 0.5);
                     bars[i].classList.remove('moving');
                     bars[j].classList.remove('moving');
                 }
@@ -202,21 +255,48 @@ print(quick_sort(arr))</code></pre>
             }
             await swap(i + 1, high);
             bars[high].classList.remove('current');
+            stats.completed++;
+            document.getElementById('completed').textContent = stats.completed;
             return i + 1;
         }
+
         async function quickSort(low, high) {
-            if (low < high) {
-                const pi = await partition(low, high);
-                await quickSort(low, pi - 1);
-                await quickSort(pi + 1, high);
-            }
+            if (!isSorting || low >= high) return;
+            const pi = await partition(low, high);
+            await quickSort(low, pi - 1);
+            await quickSort(pi + 1, high);
         }
+
         async function startSort() {
+            if (isSorting) return;
+            isSorting = true;
+            isPaused = false;
             document.getElementById('startBtn').disabled = true;
+            document.getElementById('pauseBtn').style.display = 'inline-block';
+            document.getElementById('resumeBtn').style.display = 'none';
+            resetStats();
             await quickSort(0, array.length - 1);
             const bars = document.getElementsByClassName('bar');
             for (let i = 0; i < bars.length; i++) bars[i].classList.add('sorted');
+            isSorting = false;
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('startBtn').disabled = false;
         }
+
+        function resetArray() {
+            isSorting = false;
+            isPaused = false;
+            container.innerHTML = '';
+            array = [];
+            for (let i = 0; i < 12; i++) array.push(Math.floor(Math.random() * 90) + 10);
+            renderArray();
+            resetStats();
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('pauseBtn').style.display = 'none';
+            document.getElementById('resumeBtn').style.display = 'none';
+            document.getElementById('inputArray').value = array.join(', ');
+        }
+
         resetArray();
     </script>
 </body>
