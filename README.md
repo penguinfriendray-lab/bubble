@@ -57,7 +57,9 @@
 
 ## 🚀 線上展示
 
-[點擊這裡查看互動式視覺化](https://penguinfriendray-lab.github.io/bubble/)
+[點擊這裡查看互動式視覺化](./index.html)
+
+
 
 ## 📊 複雜度比較表
 
