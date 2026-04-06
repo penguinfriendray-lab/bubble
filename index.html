@@ -159,6 +159,54 @@
             transform: none;
             box-shadow: none;
         }
+        .explanation {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 24px 56px rgba(20, 40, 68, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            margin: 32px 0;
+        }
+        .explanation h2 {
+            color: #1f3246;
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .explanation h3 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .explanation p {
+            line-height: 1.6;
+            color: #526478;
+        }
+        .explanation ol, .explanation ul {
+            line-height: 1.6;
+            color: #526478;
+        }
+        .explanation li {
+            margin-bottom: 8px;
+        }
+        .explanation pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .explanation code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -173,6 +221,58 @@
             <h1>氣泡排序 (Bubble Sort)</h1>
             <p class="subtitle">透過動畫觀察元素逐一比較與交換位置，讓氣泡排序的流程更直觀、易懂。</p>
         </section>
+
+        <section class="explanation">
+            <h2>操作原理</h2>
+            <p>氣泡排序是一種簡單的排序演算法，其基本思想是：</p>
+            <ol>
+                <li>從序列的起始位置開始，比較相鄰的兩個元素</li>
+                <li>如果前一個元素大於後一個元素，則交換它們的位置</li>
+                <li>對每一對相鄰元素重複上述過程，直到序列的最後</li>
+                <li>重複整個過程，直到沒有需要交換的元素</li>
+            </ol>
+            <p>這個過程就像氣泡一樣，較大的元素會逐漸"浮"到序列的末尾。</p>
+
+            <h3>Python 代碼實現</h3>
+            <pre><code>def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        # 標記是否發生交換
+        swapped = False
+        for j in range(0, n-i-1):
+            if arr[j] > arr[j+1]:
+                # 交換元素
+                arr[j], arr[j+1] = arr[j+1], arr[j]
+                swapped = True
+        
+        # 如果沒有發生交換，說明已經排序完成
+        if not swapped:
+            break
+    
+    return arr
+
+# 範例使用
+arr = [64, 34, 25, 12, 22, 11, 90]
+print("原始陣列:", arr)
+bubble_sort(arr)
+print("排序後:", arr)</code></pre>
+
+            <h3>複雜度分析</h3>
+            <ul>
+                <li><strong>時間複雜度：</strong>
+                    <ul>
+                        <li>最壞情況：O(n²)</li>
+                        <li>最佳情況：O(n) - 當陣列已經排序時</li>
+                        <li>平均情況：O(n²)</li>
+                    </ul>
+                    <p>需要進行 n(n-1)/2 次比較，最壞情況下需要同樣次數的交換。</p>
+                </li>
+                <li><strong>空間複雜度：</strong>O(1)</li>
+                <li><strong>穩定性：</strong>穩定排序</li>
+                <li><strong>原地排序：</strong>是</li>
+            </ul>
+        </section>
+
         <div id="container"></div>
         <div class="controls">
             <button class="btn-start" onclick="startBubbleSort()" id="startBtn">開始排序</button>

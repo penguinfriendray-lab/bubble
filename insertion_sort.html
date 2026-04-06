@@ -159,6 +159,54 @@
             transform: none;
             box-shadow: none;
         }
+        .explanation {
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 24px 56px rgba(20, 40, 68, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.75);
+            margin: 32px 0;
+        }
+        .explanation h2 {
+            color: #1f3246;
+            font-size: 1.8rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .explanation h3 {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        .explanation p {
+            line-height: 1.6;
+            color: #526478;
+        }
+        .explanation ol, .explanation ul {
+            line-height: 1.6;
+            color: #526478;
+        }
+        .explanation li {
+            margin-bottom: 8px;
+        }
+        .explanation pre {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .explanation code {
+            background: #f1f3f4;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -173,6 +221,56 @@
             <h1>插入排序 (Insertion Sort)</h1>
             <p class="subtitle">從左側已排序區開始插入新元素，逐步建立有序序列。</p>
         </section>
+
+        <section class="explanation">
+            <h2>操作原理</h2>
+            <p>插入排序是一種簡單直觀的排序演算法，其基本思想是：</p>
+            <ol>
+                <li>將序列分成已排序區間和未排序區間</li>
+                <li>從未排序區間取第一個元素</li>
+                <li>將該元素插入到已排序區間的適當位置</li>
+                <li>重複上述過程，直到未排序區間為空</li>
+            </ol>
+            <p>這個過程就像打撲克牌時整理手中的牌一樣，每次拿到新牌就插入到正確的位置。</p>
+
+            <h3>Python 代碼實現</h3>
+            <pre><code>def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]  # 當前要插入的元素
+        j = i - 1
+        
+        # 將大於 key 的元素向右移動
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        
+        # 插入 key 到正確位置
+        arr[j + 1] = key
+    
+    return arr
+
+# 範例使用
+arr = [12, 11, 13, 5, 6]
+print("原始陣列:", arr)
+insertion_sort(arr)
+print("排序後:", arr)</code></pre>
+
+            <h3>複雜度分析</h3>
+            <ul>
+                <li><strong>時間複雜度：</strong>
+                    <ul>
+                        <li>最壞情況：O(n²) - 當陣列逆序時</li>
+                        <li>最佳情況：O(n) - 當陣列已經排序時</li>
+                        <li>平均情況：O(n²)</li>
+                    </ul>
+                    <p>比較次數取決於輸入資料的初始順序。</p>
+                </li>
+                <li><strong>空間複雜度：</strong>O(1)</li>
+                <li><strong>穩定性：</strong>穩定排序</li>
+                <li><strong>原地排序：</strong>是</li>
+            </ul>
+        </section>
+
         <div id="container"></div>
         <div class="controls">
             <button class="btn-start" id="startBtn" onclick="insertionSort()">開始排序</button>
