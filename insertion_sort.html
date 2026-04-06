@@ -505,10 +505,10 @@ print("排序後:", arr)</code></pre>
                     bars[i].classList.add('current');
                     await sleep(180);
                     while (j >= 0 && array[j] > key) {
-                        bars[j].classList.add('shifting');
                         array[j + 1] = array[j];
-                        bars[j + 1].style.height = `${array[j + 1] * 2.5}px`;
-                        bars[j + 1].innerText = array[j + 1];
+                        bars[j + 1].style.height = `${array[j] * 2.5}px`;
+                        bars[j + 1].innerText = array[j];
+                        bars[j].classList.add('shifting');
                         await sleep(180);
                         bars[j].classList.remove('shifting');
                         j--;
