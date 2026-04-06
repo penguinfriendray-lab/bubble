@@ -498,30 +498,33 @@ print("排序後:", arr)</code></pre>
         async function insertionSort() {
             const bars = document.getElementsByClassName('bar');
             document.getElementById('startBtn').disabled = true;
-            for (let i = 1; i < array.length; i++) {
-                const key = array[i];
-                let j = i - 1;
-                bars[i].classList.add('current');
-                await sleep(180);
-                while (j >= 0 && array[j] > key) {
-                    bars[j].classList.add('shifting');
-                    array[j + 1] = array[j];
-                    bars[j + 1].style.height = `${array[j + 1] * 2.5}px`;
-                    bars[j + 1].innerText = array[j + 1];
+            try {
+                for (let i = 1; i < array.length; i++) {
+                    const key = array[i];
+                    let j = i - 1;
+                    bars[i].classList.add('current');
                     await sleep(180);
-                    bars[j].classList.remove('shifting');
-                    j--;
+                    while (j >= 0 && array[j] > key) {
+                        bars[j].classList.add('shifting');
+                        array[j + 1] = array[j];
+                        bars[j + 1].style.height = `${array[j + 1] * 2.5}px`;
+                        bars[j + 1].innerText = array[j + 1];
+                        await sleep(180);
+                        bars[j].classList.remove('shifting');
+                        j--;
+                    }
+                    array[j + 1] = key;
+                    bars[j + 1].style.height = `${key * 2.5}px`;
+                    bars[j + 1].innerText = key;
+                    bars[i].classList.remove('current');
+                    for (let k = 0; k <= i; k++) {
+                        bars[k].classList.add('sorted');
+                    }
+                    await sleep(120);
                 }
-                array[j + 1] = key;
-                bars[j + 1].style.height = `${key * 2.5}px`;
-                bars[j + 1].innerText = key;
-                bars[i].classList.remove('current');
-                for (let k = 0; k <= i; k++) {
-                    bars[k].classList.add('sorted');
-                }
-                await sleep(120);
+            } finally {
+                document.getElementById('startBtn').disabled = false;
             }
-            document.getElementById('startBtn').disabled = false;
         }
 
         reset();
