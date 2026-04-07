@@ -7,9 +7,6 @@
 
 [點擊這裡查看互動式視覺化](https://penguinfriendray-lab.github.io/bubble/)
 
-## 🚀 模擬介面
-
-[點擊這裡查看互動式視覺化](https://penguinfriendray-lab.github.io/bubble/)
 
 ## 📋 報告概述
 
