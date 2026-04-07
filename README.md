@@ -57,7 +57,7 @@
 
 ## 🚀 線上展示
 
-[點擊這裡查看互動式視覺化](http://127.0.0.1:5500/index.html)
+[點擊這裡查看互動式視覺化](https://penguinfriendray-lab.github.io/bubble/)
 
 > 注意：請先在 VS Code 中啟動 Live Server，然後再點擊此連結。
 
